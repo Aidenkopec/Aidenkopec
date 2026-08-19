@@ -1,0 +1,194 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1031 650' font-family='ConsolasFallback,Consolas,Menlo,monospace' width='1031px' height='650px' font-size='16px'>
+<title>Aiden Kopec: live profile card, generated every six hours</title>
+<defs>
+<linearGradient id='mark' gradientUnits='userSpaceOnUse' x1='0' y1='15' x2='0' y2='315'>
+<stop offset='0' stop-color='#3B82F6'/>
+<stop offset='1' stop-color='#0B2740'/>
+</linearGradient>
+</defs>
+<style>
+@font-face { src: local('Consolas'); font-family: 'ConsolasFallback'; font-display: swap; size-adjust: 109%; }
+.key {fill: #1D4ED8;}
+.value {fill: #1E4A72;}
+.add {fill: #0F766E;}
+.del {fill: #C2410C;}
+.dim {fill: #8FA6BC;}
+.fg {fill: #0B2740;}
+.aa1 {fill-opacity: 0.42;}
+.aa2 {fill-opacity: 0.74;}
+text, tspan {white-space: pre;}
+</style>
+<rect x='0.5' y='0.5' width='1030' height='649' rx='15' fill='#F7FAFD' stroke='#DCE7F2'/>
+<g fill='url(#mark)'>
+<rect x='154.64' y='35.0' width='5.32' height='20.5' class="aa2"/>
+<rect x='159.45' y='35.0' width='58.28' height='70.5'/>
+<rect x='337.61' y='35.0' width='63.10' height='10.5'/>
+<rect x='400.20' y='35.0' width='5.32' height='10.5' class="aa2"/>
+<rect x='149.82' y='45.0' width='5.32' height='10.5' class="aa2"/>
+<rect x='327.98' y='45.0' width='5.32' height='10.5' class="aa2"/>
+<rect x='332.79' y='45.0' width='63.10' height='10.5'/>
+<rect x='145.01' y='55.0' width='5.32' height='20.5' class="aa2"/>
+<rect x='149.82' y='55.0' width='10.13' height='90.5'/>
+<rect x='318.35' y='55.0' width='63.10' height='10.5'/>
+<rect x='380.94' y='55.0' width='5.32' height='10.5' class="aa2"/>
+<rect x='140.19' y='65.0' width='5.32' height='10.5' class="aa2"/>
+<rect x='308.72' y='65.0' width='5.32' height='10.5' class="aa2"/>
+<rect x='313.53' y='65.0' width='63.10' height='10.5'/>
+<rect x='135.38' y='75.0' width='5.32' height='20.5' class="aa2"/>
+<rect x='140.19' y='75.0' width='10.13' height='90.5'/>
+<rect x='217.23' y='75.0' width='5.32' height='80.5' class="aa1"/>
+<rect x='299.09' y='75.0' width='63.10' height='10.5'/>
+<rect x='361.68' y='75.0' width='5.32' height='10.5' class="aa2"/>
+<rect x='130.56' y='85.0' width='5.32' height='10.5' class="aa2"/>
+<rect x='289.46' y='85.0' width='5.32' height='10.5' class="aa2"/>
+<rect x='294.27' y='85.0' width='63.10' height='10.5'/>
+<rect x='125.75' y='95.0' width='5.32' height='20.5' class="aa2"/>
+<rect x='130.56' y='95.0' width='10.13' height='90.5'/>
+<rect x='279.83' y='95.0' width='63.10' height='10.5'/>
+<rect x='342.42' y='95.0' width='5.32' height='10.5' class="aa2"/>
+<rect x='120.93' y='105.0' width='5.32' height='10.5' class="aa2"/>
+<rect x='159.45' y='105.0' width='14.95' height='10.5'/>
+<rect x='178.71' y='105.0' width='39.02' height='210.5'/>
+<rect x='270.20' y='105.0' width='5.32' height='10.5' class="aa2"/>
+<rect x='275.01' y='105.0' width='63.10' height='10.5'/>
+<rect x='116.12' y='115.0' width='5.32' height='20.5' class="aa2"/>
+<rect x='120.93' y='115.0' width='10.13' height='130.5'/>
+<rect x='159.45' y='115.0' width='10.13' height='10.5'/>
+<rect x='260.57' y='115.0' width='53.47' height='20.5'/>
+<rect x='313.53' y='115.0' width='10.13' height='10.5' class="aa2"/>
+<rect x='323.16' y='115.0' width='5.32' height='10.5' class="aa1"/>
+<rect x='111.30' y='125.0' width='5.32' height='10.5' class="aa2"/>
+<rect x='159.45' y='125.0' width='5.32' height='10.5'/>
+<rect x='250.94' y='125.0' width='5.32' height='10.5' class="aa2"/>
+<rect x='255.75' y='125.0' width='5.32' height='70.5'/>
+<rect x='313.53' y='125.0' width='5.32' height='10.5' class="aa2"/>
+<rect x='111.30' y='135.0' width='10.13' height='100.5'/>
+<rect x='241.31' y='135.0' width='14.95' height='60.5'/>
+<rect x='260.57' y='135.0' width='34.21' height='20.5'/>
+<rect x='294.27' y='135.0' width='10.13' height='10.5' class="aa2"/>
+<rect x='303.90' y='135.0' width='5.32' height='10.5' class="aa1"/>
+<rect x='106.49' y='145.0' width='5.32' height='100.5'/>
+<rect x='149.82' y='145.0' width='5.32' height='10.5'/>
+<rect x='231.68' y='145.0' width='5.32' height='10.5' class="aa2"/>
+<rect x='236.49' y='145.0' width='5.32' height='60.5'/>
+<rect x='294.27' y='145.0' width='5.32' height='10.5' class="aa2"/>
+<rect x='96.86' y='155.0' width='5.32' height='20.5' class="aa2"/>
+<rect x='101.67' y='155.0' width='5.32' height='100.5'/>
+<rect x='217.23' y='155.0' width='19.76' height='60.5'/>
+<rect x='260.57' y='155.0' width='29.39' height='50.5'/>
+<rect x='140.19' y='165.0' width='5.32' height='10.5'/>
+<rect x='289.46' y='165.0' width='5.32' height='80.5'/>
+<rect x='294.27' y='165.0' width='5.32' height='10.5' class="aa1"/>
+<rect x='92.04' y='175.0' width='10.13' height='90.5'/>
+<rect x='294.27' y='175.0' width='10.13' height='80.5'/>
+<rect x='87.23' y='185.0' width='5.32' height='110.5'/>
+<rect x='130.56' y='185.0' width='5.32' height='60.5'/>
+<rect x='303.90' y='185.0' width='10.13' height='10.5' class="aa2"/>
+<rect x='82.41' y='195.0' width='5.32' height='100.5'/>
+<rect x='135.38' y='195.0' width='43.84' height='50.5'/>
+<rect x='241.31' y='195.0' width='5.32' height='10.5'/>
+<rect x='303.90' y='195.0' width='14.95' height='70.5'/>
+<rect x='77.59' y='205.0' width='5.32' height='110.5'/>
+<rect x='265.38' y='205.0' width='24.58' height='10.5'/>
+<rect x='318.35' y='205.0' width='5.32' height='70.5'/>
+<rect x='323.16' y='205.0' width='5.32' height='10.5' class="aa1"/>
+<rect x='67.97' y='215.0' width='5.32' height='20.5' class="aa2"/>
+<rect x='72.78' y='215.0' width='5.32' height='100.5'/>
+<rect x='217.23' y='215.0' width='10.13' height='10.5' class="aa2"/>
+<rect x='275.01' y='215.0' width='10.13' height='10.5' class="aa2"/>
+<rect x='284.64' y='215.0' width='5.32' height='20.5'/>
+<rect x='323.16' y='215.0' width='10.13' height='70.5'/>
+<rect x='63.15' y='225.0' width='5.32' height='10.5' class="aa2"/>
+<rect x='217.23' y='225.0' width='5.32' height='10.5' class="aa2"/>
+<rect x='279.83' y='225.0' width='5.32' height='10.5' class="aa2"/>
+<rect x='332.79' y='225.0' width='10.13' height='10.5' class="aa2"/>
+<rect x='63.15' y='235.0' width='10.13' height='80.5'/>
+<rect x='111.30' y='235.0' width='10.13' height='10.5' class="aa2"/>
+<rect x='217.23' y='235.0' width='5.32' height='80.5' class="aa1"/>
+<rect x='332.79' y='235.0' width='14.95' height='70.5'/>
+<rect x='53.52' y='245.0' width='10.13' height='10.5' class="aa2"/>
+<rect x='347.24' y='245.0' width='5.32' height='70.5'/>
+<rect x='352.05' y='245.0' width='5.32' height='10.5' class="aa2"/>
+<rect x='48.71' y='255.0' width='5.32' height='20.5' class="aa2"/>
+<rect x='53.52' y='255.0' width='10.13' height='60.5'/>
+<rect x='352.05' y='255.0' width='10.13' height='60.5'/>
+<rect x='43.89' y='265.0' width='5.32' height='10.5' class="aa2"/>
+<rect x='92.04' y='265.0' width='5.32' height='10.5'/>
+<rect x='313.53' y='265.0' width='5.32' height='10.5'/>
+<rect x='361.68' y='265.0' width='10.13' height='10.5' class="aa2"/>
+<rect x='39.08' y='275.0' width='5.32' height='20.5' class="aa2"/>
+<rect x='43.89' y='275.0' width='10.13' height='40.5'/>
+<rect x='92.04' y='275.0' width='5.32' height='10.5' class="aa1"/>
+<rect x='318.35' y='275.0' width='5.32' height='10.5' class="aa2"/>
+<rect x='361.68' y='275.0' width='14.95' height='40.5'/>
+<rect x='34.26' y='285.0' width='5.32' height='10.5' class="aa2"/>
+<rect x='327.98' y='285.0' width='5.32' height='10.5'/>
+<rect x='376.13' y='285.0' width='5.32' height='30.5'/>
+<rect x='380.94' y='285.0' width='5.32' height='10.5' class="aa2"/>
+<rect x='29.45' y='295.0' width='5.32' height='20.5' class="aa2"/>
+<rect x='34.26' y='295.0' width='10.13' height='20.5'/>
+<rect x='82.41' y='295.0' width='5.32' height='10.5' class="aa1"/>
+<rect x='380.94' y='295.0' width='10.13' height='20.5'/>
+<rect x='24.63' y='305.0' width='5.32' height='10.5' class="aa2"/>
+<rect x='342.42' y='305.0' width='5.32' height='10.5'/>
+<rect x='390.57' y='305.0' width='10.13' height='10.5' class="aa2"/>
+</g>
+<rect x='140.19' y='501' width='154.08' height='8' rx='4' fill='#0B2740' fill-opacity='0.18'/>
+<rect x='140.19' y='501' width='110.94' height='8' rx='4' fill='#3178c6'/>
+<rect x='140.19' y='521' width='154.08' height='8' rx='4' fill='#0B2740' fill-opacity='0.18'/>
+<rect x='140.19' y='521' width='21.57' height='8' rx='4' fill='#e34c26'/>
+<rect x='140.19' y='541' width='154.08' height='8' rx='4' fill='#0B2740' fill-opacity='0.18'/>
+<rect x='140.19' y='541' width='7.70' height='8' rx='4' fill='#f1e05a'/>
+<rect x='140.19' y='561' width='154.08' height='8' rx='4' fill='#0B2740' fill-opacity='0.18'/>
+<rect x='140.19' y='561' width='4.62' height='8' rx='4' fill='#b07219'/>
+<rect x='140.19' y='581' width='154.08' height='8' rx='4' fill='#0B2740' fill-opacity='0.18'/>
+<rect x='140.19' y='581' width='4.62' height='8' rx='4' fill='#663399'/>
+<rect x='140.19' y='601' width='154.08' height='8' rx='4' fill='#0B2740' fill-opacity='0.18'/>
+<rect x='140.19' y='601' width='2.00' height='8' rx='4' fill='#3572A5'/>
+<rect x='140.19' y='621' width='154.08' height='8' rx='4' fill='#0B2740' fill-opacity='0.18'/>
+<rect x='140.19' y='621' width='3.08' height='8' rx='4' fill='#8FA6BC'/>
+<text x='15' y='491' fill='#0B2740'>
+<tspan x='15' y='491'><tspan class="dim">─ </tspan><tspan class="key">Languages by bytes</tspan><tspan class="dim"> ─────────────────────</tspan></tspan>
+<tspan x='15' y='511'><tspan class="value"> TypeScript  </tspan><tspan class="dim">                 </tspan><tspan class="key">  72%</tspan></tspan>
+<tspan x='15' y='531'><tspan class="value"> HTML        </tspan><tspan class="dim">                 </tspan><tspan class="key">  14%</tspan></tspan>
+<tspan x='15' y='551'><tspan class="value"> JavaScript  </tspan><tspan class="dim">                 </tspan><tspan class="key">   5%</tspan></tspan>
+<tspan x='15' y='571'><tspan class="value"> Java        </tspan><tspan class="dim">                 </tspan><tspan class="key">   3%</tspan></tspan>
+<tspan x='15' y='591'><tspan class="value"> CSS         </tspan><tspan class="dim">                 </tspan><tspan class="key">   3%</tspan></tspan>
+<tspan x='15' y='611'><tspan class="value"> Python      </tspan><tspan class="dim">                 </tspan><tspan class="key">   1%</tspan></tspan>
+<tspan x='15' y='631'><tspan class="value"> other       </tspan><tspan class="dim">                 </tspan><tspan class="key">   2%</tspan></tspan>
+</text>
+<text x='438.7' y='31' fill='#0B2740'>
+<tspan x='438.7' y='31'><tspan class="key">aidenkopec@remote </tspan><tspan class="dim">──────────────────────────────────────────</tspan></tspan>
+<tspan x='438.7' y='51'></tspan>
+<tspan x='438.7' y='71'><tspan class="dim">· </tspan><tspan class="key">Timezone:</tspan><tspan class="dim"> ......................... </tspan><tspan class="value">UTC-6 · async-friendly</tspan></tspan>
+<tspan x='438.7' y='91'><tspan class="dim">· </tspan><tspan class="key">Uptime:</tspan><tspan class="dim"> .................................. </tspan><tspan class="value">4y 7m on GitHub</tspan></tspan>
+<tspan x='438.7' y='111'><tspan class="dim">· </tspan><tspan class="key">Offline:</tspan><tspan class="dim"> ..................... </tspan><tspan class="value">ski slopes, mountain trails</tspan></tspan>
+<tspan x='438.7' y='131'><tspan class="dim">· </tspan><tspan class="key">Focus:</tspan><tspan class="dim"> ..... </tspan><tspan class="value">Full-stack · systems that replace manual work</tspan></tspan>
+<tspan x='438.7' y='151'><tspan class="dim">· </tspan><tspan class="key">Editor:</tspan><tspan class="dim"> .......................................... </tspan><tspan class="value">VS Code</tspan></tspan>
+<tspan x='438.7' y='171'></tspan>
+<tspan x='438.7' y='191'><tspan class="dim">─ </tspan><tspan class="key">Services</tspan><tspan class="dim"> ─────────────────────────────────────────────────</tspan></tspan>
+<tspan x='438.7' y='211'><tspan class="dim">· </tspan><tspan class="value">idotogether.com</tspan><tspan class="dim"> ..................... </tspan><tspan class="add">● </tspan><tspan class="fg">110d   200 · 278ms</tspan></tspan>
+<tspan x='438.7' y='231'><tspan class="dim">· </tspan><tspan class="value">aidenkopec.com</tspan><tspan class="dim"> ..................... </tspan><tspan class="add">● </tspan><tspan class="fg">1291d   200 · 421ms</tspan></tspan>
+<tspan x='438.7' y='251'></tspan>
+<tspan x='438.7' y='271'><tspan class="dim">─ </tspan><tspan class="key">In Production</tspan><tspan class="dim"> ────────────────────────────────────────────</tspan></tspan>
+<tspan x='438.7' y='291'><tspan class="dim">· </tspan><tspan class="key">Core:</tspan><tspan class="dim"> ................ </tspan><tspan class="value">TypeScript, JavaScript, Python, SQL</tspan></tspan>
+<tspan x='438.7' y='311'><tspan class="dim">· </tspan><tspan class="key">Frontend:</tspan><tspan class="dim"> ............ </tspan><tspan class="value">Next.js, React, Vue 3, Tailwind CSS</tspan></tspan>
+<tspan x='438.7' y='331'><tspan class="dim">· </tspan><tspan class="key">Backend:</tspan><tspan class="dim"> . </tspan><tspan class="value">Node.js, PostgreSQL, Redis, BullMQ, Drizzle ORM</tspan></tspan>
+<tspan x='438.7' y='351'><tspan class="dim">· </tspan><tspan class="key">Infra:</tspan><tspan class="dim"> ................ </tspan><tspan class="value">AWS, Vercel, Docker, Linux, Stripe</tspan></tspan>
+<tspan x='438.7' y='371'></tspan>
+<tspan x='438.7' y='391'><tspan class="dim">─ </tspan><tspan class="key">GitHub</tspan><tspan class="dim"> ───────────────────────────────────────────────────</tspan></tspan>
+<tspan x='438.7' y='411'><tspan class="dim">· </tspan><tspan class="key">Repos:</tspan><tspan class="dim"> ............................. </tspan><tspan class="value">7 public</tspan><tspan class="dim"> · </tspan><tspan class="value">60 private</tspan></tspan>
+<tspan x='438.7' y='431'><tspan class="dim">· </tspan><tspan class="key">Stars:</tspan><tspan class="dim"> ............................. </tspan><tspan class="value">6 received</tspan><tspan class="dim"> · </tspan><tspan class="value">51 given</tspan></tspan>
+<tspan x='438.7' y='451'><tspan class="dim">· </tspan><tspan class="key">Commits (1y):</tspan><tspan class="dim"> ........................................ </tspan><tspan class="value">748</tspan></tspan>
+<tspan x='438.7' y='471'><tspan class="dim">· </tspan><tspan class="key">Followers:</tspan><tspan class="dim"> ............................................. </tspan><tspan class="value">6</tspan></tspan>
+<tspan x='438.7' y='491'><tspan class="dim">· </tspan><tspan class="key">Last push:</tspan><tspan class="dim"> ........................................ </tspan><tspan class="value">2h ago</tspan></tspan>
+<tspan x='438.7' y='511'></tspan>
+<tspan x='438.7' y='531'><tspan class="dim">─ </tspan><tspan class="key">Contact</tspan><tspan class="dim"> ──────────────────────────────────────────────────</tspan></tspan>
+<tspan x='438.7' y='551'><tspan class="dim">· </tspan><tspan class="key">Email:</tspan><tspan class="dim"> ............................. </tspan><tspan class="value">Aidenkopec@icloud.com</tspan></tspan>
+<tspan x='438.7' y='571'><tspan class="dim">· </tspan><tspan class="key">LinkedIn:</tspan><tspan class="dim"> .................................... </tspan><tspan class="value">aiden-kopec</tspan></tspan>
+<tspan x='438.7' y='591'><tspan class="dim">· </tspan><tspan class="key">Portfolio:</tspan><tspan class="dim"> ................................ </tspan><tspan class="value">aidenkopec.com</tspan></tspan>
+<tspan x='438.7' y='611'></tspan>
+<tspan x='438.7' y='631'><tspan class="dim">Last checked: 2026-08-19 23:37 UTC</tspan></tspan>
+</text>
+</svg>

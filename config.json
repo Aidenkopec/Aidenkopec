@@ -1,0 +1,37 @@
+{
+  "username": "Aidenkopec",
+  "header": "aidenkopec@remote",
+
+  "timezone": { "zone": "America/Edmonton", "note": "async-friendly" },
+
+  "//exclude_repos": "Repos owned but not authored. GitHub reports a repo's whole language breakdown regardless of who wrote it, so anything vendored, cloned or scaffolded here would otherwise be counted as your code. This affects the LANGUAGE BYTES ONLY. The repo count and star sum must keep matching what a visitor sees on the profile, so excluded repos are still counted and still contribute their stars.",
+  "exclude_repos": ["freqtrade"],
+
+  "identity": [
+    ["Timezone",   "@timezone"],
+    ["Uptime",     "@uptime"],
+    ["Offline",    "ski slopes, mountain trails"],
+    ["Focus",      "Full-stack · systems that replace manual work"],
+    ["Editor",     "VS Code"]
+  ],
+
+  "//services": "since = the date the SERVICE went live, not the first commit of the code currently serving it. A rewrite is a redeploy, not a birth, so it does not reset the clock. idotogether.com: built from 2026-01-07, launched 2026-05-01. aidenkopec.com: served continuously across aidenkopec.github.io (2022-07-24), aiden-3d-portfolio (2023-03-04) and aidenkopec-portfolio (2025-08-18); 2023-02-05 is the domain going live, one month before the first repo that ran on it.",
+
+  "services": [
+    { "name": "idotogether.com", "url": "https://idotogether.com", "since": "2026-05-01" },
+    { "name": "aidenkopec.com",  "url": "https://aidenkopec.com",  "since": "2023-02-05" }
+  ],
+
+  "stack": [
+    ["Core",      "TypeScript, JavaScript, Python, SQL"],
+    ["Frontend",  "Next.js, React, Vue 3, Tailwind CSS"],
+    ["Backend",   "Node.js, PostgreSQL, Redis, BullMQ, Drizzle ORM"],
+    ["Infra",     "AWS, Vercel, Docker, Linux, Stripe"]
+  ],
+
+  "contact": [
+    ["Email",     "Aidenkopec@icloud.com"],
+    ["LinkedIn",  "aiden-kopec"],
+    ["Portfolio", "aidenkopec.com"]
+  ]
+}
