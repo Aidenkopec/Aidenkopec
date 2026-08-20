@@ -1,0 +1,16 @@
+# dark_mode.svg and light_mode.svg are build output, not source. Every render
+# rewrites the timestamp, the latency figures and "Last push", so two renders at
+# different times always differ on the same lines and a three-way merge has
+# nothing meaningful to reconcile.
+#
+# merge=ours resolves those merges to the local side silently. The content does
+# not matter: the next scheduled run re-renders both files from live data, so any
+# side taken is correct within six hours.
+#
+# The driver has to be enabled once per clone, since git does not run a driver it
+# has not been told about:
+#
+#     git config merge.ours.driver true
+#
+dark_mode.svg  merge=ours
+light_mode.svg merge=ours

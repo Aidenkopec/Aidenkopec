@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """Render a live neofetch-style profile card to dark_mode.svg and light_mode.svg.
 
-Static content comes from config.json. Everything else is measured at run time:
-service health is probed over HTTPS, and repo counts, star counts, commit totals
-and the language breakdown all come from one paged GraphQL query.
+Static content comes from config.json; everything else is measured at run time.
+Service health is probed over HTTPS, and repo counts, star counts, commit totals
+and the language breakdown come from one paged GraphQL query. ARCHITECTURE.md
+covers the layout model and the invariants the tests pin.
 
-Stdlib only.
+Stdlib only, so CI needs no install step.
 
-    ACCESS_TOKEN=<pat> python3 today.py     # the real thing, overwrites the SVGs
-    python3 today.py --offline              # no token, no network, writes preview/
+    ACCESS_TOKEN=<pat> python3 today.py   # overwrites dark_mode.svg and light_mode.svg
+    python3 today.py --offline            # fixtures, no token or network; writes preview/
 """
 
 import json
@@ -79,14 +80,13 @@ BASELINE_LIFT = 4
 OVERLAP = 0.5
 
 # ascii.txt is authored and committed as text, but the monogram is *drawn* as
-# rectangles rather than typeset. Two reasons, both measured rather than assumed:
-# a full block is 1.027em tall, so at FONT_SIZE it stands 16.4px inside a 20px
-# row and the mark renders as venetian blinds; and abutting glyphs leave a
-# hairline seam at every cell boundary because ink width and advance width are
-# not the same number. Drawing the quadrants lands them exactly on the grid, in
-# every viewer, and sidesteps the fact that ▘▝▖▗ have thinner font coverage than
-# the half-blocks they replaced. The panel stays real text -- it is terminal
-# output, and it should be selectable and searchable.
+# rectangles rather than typeset. Two measured reasons: a full block glyph is
+# 1.027em tall, so at FONT_SIZE it stands 16.4px inside a 20px row and the mark
+# renders as venetian blinds; and abutting glyphs leave a hairline seam at every
+# cell boundary, because ink width and advance width are not the same number.
+# Drawing the quadrants lands them on the grid exactly, in every viewer, and
+# sidesteps the patchy font coverage of ▘▝▖▗. The panel stays real text --
+# it is terminal output, and should be selectable and searchable.
 GLYPH_BITS = {
     " ": (0, 0, 0, 0), "▘": (1, 0, 0, 0), "▝": (0, 1, 0, 0), "▀": (1, 1, 0, 0),
     "▖": (0, 0, 1, 0), "▌": (1, 0, 1, 0), "▞": (0, 1, 1, 0), "▛": (1, 1, 1, 0),
@@ -102,12 +102,14 @@ COVER_TIERS = ((7, None), (3, "aa2"), (-1, "aa1"))
 # ----------------------------------------------------------------- http
 
 def _request(url, headers=None, data=None, timeout=15):
+    """Open `url` over verified TLS. The single network call in the module."""
     req = urllib.request.Request(url, data=data, headers=headers or {})
     ctx = ssl.create_default_context()
     return urllib.request.urlopen(req, timeout=timeout, context=ctx)
 
 
 def gh_headers():
+    """Authenticated GitHub API headers. Exits if ACCESS_TOKEN is unset."""
     if not TOKEN:
         sys.exit("ACCESS_TOKEN is not set. Create a PAT with read:user and repo scope.")
     return {
@@ -118,16 +120,16 @@ def gh_headers():
 
 
 def graphql(query, variables, attempts=3, required=True):
-    """POST the query, retrying transport failures.
+    """POST `query` and return its `data` block, retrying transport failures.
 
-    probe() already retries; this did not, so a single 502 from GitHub -- which
-    happens -- would fail an unattended cron and leave the card stale for six
-    hours. A GraphQL `errors` payload is not retried: that means the query is
-    wrong, and repeating it will not make it right.
+    Transport errors are retried with a linear backoff, because GitHub returns
+    the occasional 502 and an unattended cron would otherwise leave the card
+    stale until the next run six hours later. A GraphQL `errors` payload is never
+    retried: the query is wrong, and repeating it will not make it right.
 
-    `required=False` reports the failure and returns None instead of exiting, for
-    a query that only enriches the card. Losing detail on one row beats failing
-    the build and leaving every row stale until the next run.
+    With `required=False` a failure is reported on stderr and returns None
+    instead of exiting, for queries that only enrich the card. Losing one row of
+    detail beats failing the build and leaving every row stale.
     """
     body = json.dumps({"query": query, "variables": variables}).encode()
     headers = gh_headers()
@@ -156,10 +158,13 @@ def graphql(query, variables, attempts=3, required=True):
 # ----------------------------------------------------------------- probes
 
 def probe(url, attempts=2):
-    """Return (ok, status, latency_ms). Never raises; a dead service is data.
+    """Probe `url` and return (ok, status, latency_ms).
 
-    Retries once: the card can stand for six hours, which is far too long to show a
-    live site as down because one TCP connect happened to lose a race.
+    Never raises -- a dead service is data, not an error. `status` is None when
+    nothing answered at all, and `latency_ms` is None unless something did.
+
+    Retried once, because the card stands for six hours: far too long to show a
+    live site as down over a single TCP connect that lost a race.
     """
     status = None
     for attempt in range(attempts):
@@ -225,22 +230,21 @@ query($login: String!) {
 
 
 def profile_repo_push(login):
-    """Newest commit in the profile repo that `login` wrote themselves, or None.
+    """Newest commit in the profile repo that `login` authored, or None.
 
-    The profile repo's own pushedAt is useless as a signal: this workflow commits
-    the rendered SVGs back into it on every run, so the timestamp reports the cron
-    schedule rather than any work -- it read ~5h ago forever, matching the previous
-    bot commit to the second. Skipping the repo outright was the first fix and
-    traded one wrong answer for another: it hid real commits here, including every
-    change to this file. Filtering the bot out by author keeps them visible.
+    The profile repo's own pushedAt cannot answer this: the workflow commits the
+    rendered SVGs back into it on every run, so that timestamp tracks the cron
+    schedule rather than any work. Ignoring the repo outright would instead hide
+    real commits made here, including every change to this file, so the bot is
+    filtered out by author.
 
-    Its own request, and a non-fatal one, because this is the only part of the card
-    that is an enrichment rather than a fact: if the field ever changes shape,
-    "Last push" loses one repo's worth of reach instead of the cron failing and
-    every row on the card going stale.
+    Its own request, and a non-fatal one -- see graphql(required=False). This is
+    the only enrichment on the card rather than a fact, so a schema change here
+    costs "Last push" one repo's worth of reach instead of failing the build and
+    leaving every row stale.
 
-    Only the most recent commits are searched. If the user's last commit here is
-    older than those, some other repo is newer anyway and this could never win.
+    Only the first page of history is searched: a commit older than that is older
+    than some other repo's push and could never win anyway.
     """
     data = graphql(PROFILE_QUERY, {"login": login}, required=False)
     ref = ((data or {}).get("repository") or {}).get("defaultBranchRef") or {}
@@ -253,21 +257,20 @@ def profile_repo_push(login):
 
 
 def github_stats(login, exclude=()):
-    """Everything the panel needs, from one paged query.
+    """Every measurement the panel needs, from one paged query.
 
-    Forks are filtered server-side with `isFork: false`. `exclude` drops repos
-    that are owned but not authored from the **language bytes only**: GitHub
-    reports a repo's whole language breakdown regardless of who wrote it, so one
-    vendored project can dominate the bars with code that is not yours.
+    Forks are filtered server-side with `isFork: false`.
 
-    It deliberately does not touch the repo count or the star sum. Those have to
-    agree with what a visitor sees on the profile, and an excluded repo is still
-    listed there and can still be starred. Filtering them as well is what made
-    the card report 6 public against a profile showing 7.
+    `exclude` drops repos that are owned but not authored from the language bytes
+    only. GitHub reports a repo's whole language breakdown regardless of who
+    wrote it, so one vendored project can otherwise dominate the bars. The repo
+    count and star sum deliberately still include those repos: both totals have
+    to agree with the public profile, where an excluded repo is still listed and
+    can still be starred.
 
-    "Last push" is the newest pushedAt across every repo but the profile repo,
-    plus the newest commit in that one the user wrote themselves -- see
-    profile_repo_push for why it cannot speak for itself.
+    `pushed_at` is the newest pushedAt across every repo but the profile repo,
+    plus the newest commit there that the user authored -- see profile_repo_push
+    for why that repo cannot speak for itself.
     """
     after, pushed = None, None
     stars, languages = 0, {}
@@ -284,8 +287,8 @@ def github_stats(login, exclude=()):
             else:
                 public += 1
             stars += node["stargazerCount"]
-            # The profile repo's pushedAt is ignored here and only here; its real
-            # commits come back through profile_repo_push below.
+            # Only its pushedAt is skipped; profile_repo_push recovers the
+            # real commits made here.
             if node["name"].lower() != login.lower():
                 if node["pushedAt"] and (pushed is None or node["pushedAt"] > pushed):
                     pushed = node["pushedAt"]
@@ -335,8 +338,8 @@ def language_shares(languages, count=LANG_COUNT):
 
     exact = [(name, 100.0 * size / total, color) for name, size, color in rows]
     out = [[name, int(pct), color] for name, pct, color in exact]
-    # Hand the rounding remainder to whoever lost the most to it, so the column
-    # always totals 100 without any single bar being visibly wrong.
+    # Largest remainder: the shortfall goes to the rows truncation cost the most,
+    # so the column totals 100 without any single bar being visibly wrong.
     short = 100 - sum(pct for _, pct, _ in out)
     order = sorted(range(len(exact)), key=lambda i: exact[i][1] - int(exact[i][1]), reverse=True)
     for i in order[:short]:
@@ -368,15 +371,15 @@ def days_since(iso_date):
 
 
 def relative_time(iso_stamp, now=None):
-    """"4h ago" / "3d ago" from an ISO-8601 UTC stamp, or None if it cannot be read.
+    """Format an ISO-8601 UTC stamp as "4h ago" / "3d ago", or None if unreadable.
 
-    Rounds rather than floors below a year: `//` reports 5h59m as "5h ago", a full
-    hour of lag always in the same direction. Years floor instead, matching
-    account_age -- rounding there would read 1y7m as "2y", and half a year of
-    overstatement is not a rounding artifact, it is a wrong claim.
+    Sub-year values round rather than floor: flooring reports 5h59m as "5h ago",
+    an hour of lag always in the same direction. Years floor instead, matching
+    account_age, because rounding would read 1y7m as "2y" -- an overstatement,
+    not a rounding artifact.
 
-    A stamp in the future is clock skew between GitHub and the runner rather than
-    a prediction, so anything under a minute either way reads "just now".
+    A stamp ahead of `now` is clock skew between GitHub and the runner rather
+    than a prediction, so anything within a minute either way reads "just now".
     """
     if not iso_stamp:
         return None
@@ -399,12 +402,11 @@ def relative_time(iso_stamp, now=None):
 
 
 def account_age(created_at):
-    """"4y 11m on GitHub" from the account's own createdAt.
+    """Format createdAt as "4y 11m on GitHub", or None under a month old.
 
-    Deliberately account age and not years of experience. An experience figure
-    on a public card is a claim that has to agree with every resume and cover
-    letter in circulation; account age is a fact the API reports, and the label
-    says what it measures so it cannot be read as either.
+    Account age, deliberately, and not years of experience: this is a fact the
+    API reports, and the label names what it measures so the two cannot be read
+    as each other. Months floor, so the figure is never overstated.
     """
     if not created_at:
         return None
@@ -426,11 +428,12 @@ def account_age(created_at):
 
 
 def utc_offset(config):
-    """"UTC-7 · async-friendly", with the offset resolved through the tz database.
+    """Format the configured zone as "UTC-7 · async-friendly".
 
-    Hardcoding the offset would be wrong for five months a year: this zone is
-    UTC-6 on daylight time and UTC-7 the rest of the year. Returns None rather
-    than guessing if the zone cannot be resolved, and the row is then omitted.
+    The offset is resolved through the tz database on every run: this zone is
+    UTC-6 on daylight time and UTC-7 the rest of the year, so a hardcoded value
+    would be wrong for five months. Returns None if the zone cannot be resolved,
+    and the caller drops the row rather than guess.
     """
     if not config or not ZoneInfo:
         return None
@@ -451,10 +454,12 @@ def utc_offset(config):
 # ----------------------------------------------------------------- rows
 
 def esc(text):
+    """Escape the characters that would otherwise open markup inside the SVG."""
     return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
 def span(text, cls=None):
+    """Wrap `text` in an optionally classed <tspan>. Empty text emits nothing."""
     if not text:
         return ""
     attr = ' class="%s"' % cls if cls else ""
@@ -517,6 +522,7 @@ def row(label, value, value_cls="value"):
 
 
 def service_row(name, ok, status, latency, uptime_days):
+    """A Services row: name, health dot, days live, then latency or the failure."""
     bits = []
     if uptime_days is not None:
         bits.append("%dd" % uptime_days)
@@ -554,6 +560,7 @@ def identity_rows(cfg, stats):
 
 
 def build_rows(cfg, stats, services):
+    """The right-hand panel, as one markup string per row (blank string = spacer)."""
     rows = []
     header = cfg["header"]
     rows.append(span(header + " ", "key") + span("─" * (PANEL_COLS - len(header) - 1), "dim"))
@@ -574,9 +581,8 @@ def build_rows(cfg, stats, services):
     rows.append("")
 
     rows.append(rule("GitHub"))
-    # Split, because the Repositories tab a reader clicks through to shows only
-    # the public ones. A single combined total reads as inflated the moment they
-    # compare, and takes every other number on the card down with it.
+    # Split public from private: the Repositories tab a reader clicks through to
+    # lists only the public ones, so one combined total reads as inflated.
     public, private = stats["repos_public"], stats["repos_private"]
     if private:
         rows.append(compose(
@@ -586,18 +592,16 @@ def build_rows(cfg, stats, services):
         ))
     else:
         rows.append(row("Repos", str(public)))
-    # Both directions, because the two numbers differ and the profile page shows
-    # the other one: 6 stars earned is not the 51 repos he has starred.
+    # Both directions: the profile page shows stars given, which is a different
+    # and much larger number than stars received.
     rows.append(compose(
         [("· ", "dim"), ("Stars:", "key")],
         [("%d received" % stats["stars"], "value"), (" · ", "dim"),
          ("%d given" % stats["starred"], "value")],
     ))
-    # The timeframe is in the label because contributionsCollection is already
-    # scoped to the past year, and "Commits" alone reads as all-time. Commits and
-    # not contributions: the contribution graph is right below this card on the
-    # profile, so restating its total says nothing, and that total counts opening
-    # an issue the same as writing code.
+    # The window is in the label: contributionsCollection is scoped to the past
+    # year, and "Commits" alone reads as all-time. Commits rather than
+    # contributions, which count opening an issue the same as writing code.
     rows.append(row("Commits (1y)", "{:,}".format(stats["commits"])))
     rows.append(row("Followers", str(stats["followers"])))
     pushed = relative_time(stats.get("pushed_at"))
@@ -639,6 +643,7 @@ def read_art():
 
 
 def _tier(digit):
+    """The softening class for an ink-coverage digit; None if the cell is solid."""
     for threshold, cls in COVER_TIERS:
         if digit >= threshold:
             return cls
@@ -733,10 +738,17 @@ def bar_block(title, bars, first_row, palette):
 # ----------------------------------------------------------------- svg
 
 def render(theme_name, palette, art, art_rows, blocks, rows, outdir):
-    # One row band drives everything: row i owns [PAD + LINE_H*i, PAD + LINE_H*(i+1)].
-    # The monogram's rectangles fill their bands exactly, and text baselines sit
-    # BASELINE_LIFT above the band's bottom edge.
-    # Each block costs a title row plus its bars; blank rows separate them.
+    """Write one themed SVG into `outdir` and return its path.
+
+    A single row band drives every coordinate: row i owns
+    [PAD + LINE_H*i, PAD + LINE_H*(i+1)]. The monogram's rectangles fill their
+    bands exactly and text baselines sit BASELINE_LIFT above each band's bottom
+    edge, which is what keeps the two columns on one grid.
+
+    The card is as tall as its taller column: the panel, or the monogram plus the
+    bar blocks stacked under it.
+    """
+    # Each block costs a title row plus its bars, with a blank row between blocks.
     sized = [(title, bars) for title, bars in blocks if bars]
     block_rows = sum(1 + len(bars) for _, bars in sized) + max(len(sized) - 1, 0)
     n_rows = max(len(rows), art_rows + 2 + block_rows)
@@ -848,6 +860,7 @@ def offline_fixtures(cfg):
 
 
 def main():
+    """Render both themes from config.json, live or from offline fixtures."""
     offline = "--offline" in sys.argv
 
     with open(os.path.join(HERE, "config.json"), encoding="utf-8") as fh:

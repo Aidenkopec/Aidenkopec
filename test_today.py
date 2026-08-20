@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""Tests for today.py. Stdlib only, like the thing it tests.
+"""Tests for today.py. Stdlib only, like the module under test.
 
     python3 -m unittest -v
 
 Nothing here touches the network: the two functions that would are exercised with
-their single request stubbed. So the suite runs in CI ahead of the render step and
+_request stubbed. The suite therefore runs in CI ahead of the render step, and
 fails the build before a bad card can be committed over a good one.
 
-The card is generated unattended and read by strangers, so the properties worth
-pinning are the ones a human would otherwise have to notice by eye: rows are
-exactly PANEL_COLS wide, language bars total exactly 100%, and every number on the
-card is either measured or absent -- never a placeholder and never a guess.
+The card is generated unattended and read by strangers, so what is worth pinning
+is what a human would otherwise have to catch by eye: rows are exactly
+PANEL_COLS wide, language bars total exactly 100%, and every number is either
+measured or absent -- never a placeholder and never a guess.
 """
 
 import json
@@ -60,9 +60,8 @@ class RelativeTimeTest(unittest.TestCase):
 
     def test_minutes_tier_is_reachable(self):
         # Regression: aiming the value at the middle of the refresh window added a
-        # fixed three hours to every stamp, which put the floor of the range past
-        # this tier entirely. Nothing could render in minutes, and a push a minute
-        # old reported "3h ago".
+        # fixed three hours to every stamp, putting the floor of the range past
+        # this tier. A push a minute old reported "3h ago".
         for seconds in (61, 90, 600, 3000):
             with self.subTest(seconds=seconds):
                 self.assertTrue(today.relative_time(stamp(seconds=seconds), now=NOW)
@@ -79,8 +78,8 @@ class RelativeTimeTest(unittest.TestCase):
         self.assertEqual(today.relative_time(stamp(days=6, hours=20), now=NOW), "1w ago")
 
     def test_years_floor_so_the_figure_is_never_overstated(self):
-        # Rounding here would read 1y7m as "2y". Half a year of overstatement is
-        # not a rounding artifact, and account_age floors for the same reason.
+        # Rounding would read 1y7m as "2y" -- an overstatement, not a rounding
+        # artifact. account_age floors for the same reason.
         self.assertEqual(today.relative_time(stamp(days=572), now=NOW), "1y ago")
         self.assertEqual(today.relative_time(stamp(days=364 + 365), now=NOW), "1y ago")
         self.assertEqual(today.relative_time(stamp(days=730), now=NOW), "2y ago")
@@ -136,9 +135,8 @@ class AccountAgeTest(unittest.TestCase):
                                  expected + " on GitHub")
 
     def test_says_what_it_measures(self):
-        # Deliberately account age, not years of experience: an experience figure
-        # on a public card is a claim that has to agree with every resume in
-        # circulation. The label is the whole point, so it is pinned.
+        # Account age, not years of experience. The label is what keeps the two
+        # from being read as each other, so it is pinned.
         self.assertTrue(today.account_age(self.months_before_now(24)).endswith(" on GitHub"))
 
     def test_an_account_younger_than_a_month_has_nothing_to_report(self):
@@ -462,8 +460,8 @@ class GithubStatsTest(unittest.TestCase):
 
     def test_excluded_repos_lose_their_bytes_but_keep_their_count_and_stars(self):
         # GitHub reports a repo's whole language breakdown regardless of who wrote
-        # it, so a vendored project would otherwise dominate the bars. The repo
-        # count and star sum still have to agree with the public profile.
+        # it, so a vendored project would otherwise dominate the bars. Counts and
+        # stars still have to agree with the public profile.
         stats = self.collect(
             [page([repo("mine", stars=1, languages=[("Python", 100)]),
                    repo("freqtrade", stars=2, languages=[("Python", 900_000)])])],
@@ -623,8 +621,11 @@ class GraphqlTest(unittest.TestCase):
 # ----------------------------------------------------------------- whole card
 
 class RenderTest(unittest.TestCase):
-    """The offline path end to end. Only the measurements are fixtures; every
-    layout, color and glyph decision downstream is the real one."""
+    """The offline path end to end.
+
+    Only the measurements are fixtures; every layout, color and glyph decision
+    downstream is the real one.
+    """
 
     @classmethod
     def setUpClass(cls):

@@ -102,6 +102,7 @@ def asciify(path, cols):
 
 
 def main():
+    """CLI entry point: preview the art, or write ascii.txt and ascii.cov."""
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     if not args:
         sys.exit(__doc__)

@@ -1,11 +1,15 @@
+# Re-renders the profile card SVGs and commits them back to main.
+# The test suite gates the render step, so a broken card can never be committed
+# over a working one.
 name: Build profile card
 
+# Deliberately not triggered by `push`. The bot commits the rendered SVGs back to
+# main, so rendering on push means every push you make is immediately followed by a
+# bot commit on the same two files -- and the next local commit conflicts.
 on:
   schedule:
     - cron: "0 */6 * * *"
   workflow_dispatch:
-  push:
-    branches: [main]
 
 permissions:
   contents: write
