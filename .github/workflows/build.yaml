@@ -24,6 +24,9 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Run tests
+        run: python3 -m unittest discover -q
+
       - name: Render SVGs
         env:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
