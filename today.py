@@ -31,6 +31,11 @@ PREVIEW = os.path.join(HERE, "preview")
 TOKEN = os.environ.get("ACCESS_TOKEN", "")
 GRAPHQL = "https://api.github.com/graphql"
 
+# How often the card is rebuilt. Must match the cron in .github/workflows/build.yaml:
+# relative_time uses it to aim "Last push" at the middle of the window between two
+# renders, so a schedule change here without one there re-introduces the bias.
+REFRESH = 6 * 3600
+
 # Layout. The card is a fixed character grid; every x is column * CHAR_W.
 # CHAR_W is the advance width of the rendered font at FONT_SIZE: Menlo and DejaVu
 # Sans Mono both advance 1233/2048 em (9.63px at 16px), and the size-adjust in the
@@ -238,8 +243,14 @@ def github_stats(login, exclude=()):
             else:
                 public += 1
             stars += node["stargazerCount"]
-            if node["pushedAt"] and (pushed is None or node["pushedAt"] > pushed):
-                pushed = node["pushedAt"]
+            # The profile repo is skipped here and only here. This workflow pushes
+            # the rendered SVGs back into it every run, which bumps its own
+            # pushedAt, so counting it makes "Last push" a readout of the cron
+            # schedule rather than of any work: it reported ~5h ago forever,
+            # matching the previous bot commit to the second.
+            if node["name"].lower() != login.lower():
+                if node["pushedAt"] and (pushed is None or node["pushedAt"] > pushed):
+                    pushed = node["pushedAt"]
             if node["name"].lower() in skip:
                 continue  # counted and starred above; only its bytes are dropped
             for edge in (node.get("languages") or {}).get("edges") or []:
@@ -291,8 +302,32 @@ def language_shares(languages, count=LANG_COUNT):
     return [(name, "%d%%" % pct, pct / 100.0, color) for name, pct, color in out]
 
 
-def relative_time(iso_stamp):
-    """"4h ago" / "3d ago". Coarse on purpose: the card only refreshes every 6h."""
+# (limit, unit, suffix): the tier applies while the elapsed time is under `limit`,
+# and is then reported in multiples of `unit`. Years are handled past the last tier.
+TIME_TIERS = (
+    (3600, 60, "m"),
+    (86400, 3600, "h"),
+    (86400 * 7, 86400, "d"),
+    (86400 * 365, 86400 * 7, "w"),
+)
+
+
+def relative_time(iso_stamp, now=None):
+    """"4h ago" / "3d ago", aimed at the middle of the window it gets read in.
+
+    The string is frozen into the SVG when the cron runs, but nobody reads it then:
+    it is read at some unknown point over the following REFRESH seconds, by which
+    time the real gap has grown. Rendering the gap as measured therefore runs late
+    by 0..REFRESH, always in the same direction. Adding half a refresh period aims
+    the value at the middle of that window, so the error is centred on zero and
+    bounded by REFRESH/2 either way instead of stacking up on one side.
+
+    Rounding rather than flooring removes the other one-sided lag: `//` reported
+    5h59m as "5h ago", costing up to another full hour in the same direction.
+
+    The tradeoff is that a push made just before a render reads ~REFRESH/2 old
+    immediately after that render. That is the cost of being unbiased on average.
+    """
     if not iso_stamp:
         return None
     try:
@@ -300,16 +335,17 @@ def relative_time(iso_stamp):
     except ValueError:
         # Drop the row rather than fail the build over a stamp format change.
         return None
-    seconds = (datetime.now(timezone.utc) - when).total_seconds()
+    seconds = ((now or datetime.now(timezone.utc)) - when).total_seconds() + REFRESH / 2
     if seconds < 0:
         return "just now"
-    for size, suffix in ((3600, "m"), (86400, "h"), (86400 * 7, "d")):
-        if seconds < size:
-            unit = size // 60 if suffix == "m" else (3600 if suffix == "h" else 86400)
-            return "%d%s ago" % (max(int(seconds // unit), 1), suffix)
-    if seconds < 86400 * 365:
-        return "%dw ago" % max(int(seconds // (86400 * 7)), 1)
-    return "%dy ago" % int(seconds // (86400 * 365))
+    for limit, unit, suffix in TIME_TIERS:
+        if seconds < limit:
+            value = max(int(round(seconds / unit)), 1)
+            if value * unit < limit:
+                return "%d%s ago" % (value, suffix)
+            # Rounding pushed it over its own tier (59m40s -> "60m"). Fall through
+            # and let the next tier say "1h" instead.
+    return "%dy ago" % max(int(round(seconds / (86400 * 365))), 1)
 
 
 def account_age(created_at):
