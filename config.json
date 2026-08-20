@@ -4,7 +4,7 @@
 
   "timezone": { "zone": "America/Edmonton", "note": "async-friendly" },
 
-  "//exclude_repos": "Repos owned but not authored -- vendored, cloned or scaffolded. GitHub reports a repo's whole language breakdown regardless of who wrote it, so these would otherwise be counted as your code. Affects the LANGUAGE BYTES ONLY: excluded repos are still counted and still contribute their stars, so the card keeps agreeing with the public profile. See github_stats() in today.py.",
+  "//exclude_repos": "Repos you own but did not author -- vendored, cloned or scaffolded. Language bytes only: an excluded repo is still counted and still contributes its stars, so the card keeps agreeing with the public profile. See github_stats() in today.py.",
   "exclude_repos": ["freqtrade"],
 
   "identity": [
