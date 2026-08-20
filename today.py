@@ -18,7 +18,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 try:
     from zoneinfo import ZoneInfo  # stdlib since 3.9; needs system tzdata
@@ -30,11 +30,6 @@ PREVIEW = os.path.join(HERE, "preview")
 
 TOKEN = os.environ.get("ACCESS_TOKEN", "")
 GRAPHQL = "https://api.github.com/graphql"
-
-# How often the card is rebuilt. Must match the cron in .github/workflows/build.yaml:
-# relative_time uses it to aim "Last push" at the middle of the window between two
-# renders, so a schedule change here without one there re-introduces the bias.
-REFRESH = 6 * 3600
 
 # Layout. The card is a fixed character grid; every x is column * CHAR_W.
 # CHAR_W is the advance width of the rendered font at FONT_SIZE: Menlo and DejaVu
@@ -122,29 +117,40 @@ def gh_headers():
     }
 
 
-def graphql(query, variables, attempts=3):
+def graphql(query, variables, attempts=3, required=True):
     """POST the query, retrying transport failures.
 
     probe() already retries; this did not, so a single 502 from GitHub -- which
     happens -- would fail an unattended cron and leave the card stale for six
     hours. A GraphQL `errors` payload is not retried: that means the query is
     wrong, and repeating it will not make it right.
+
+    `required=False` reports the failure and returns None instead of exiting, for
+    a query that only enriches the card. Losing detail on one row beats failing
+    the build and leaving every row stale until the next run.
     """
     body = json.dumps({"query": query, "variables": variables}).encode()
     headers = gh_headers()
     headers["Content-Type"] = "application/json"
+
+    def failed(message):
+        if required:
+            sys.exit(message)
+        sys.stderr.write(message + "\n")
+        return None
+
     for attempt in range(attempts):
         try:
             with _request(GRAPHQL, headers, body) as resp:
                 payload = json.loads(resp.read().decode())
-            break
         except Exception as exc:
             if attempt + 1 == attempts:
-                sys.exit("GraphQL request failed after %d attempts: %s" % (attempts, exc))
+                return failed("GraphQL request failed after %d attempts: %s" % (attempts, exc))
             time.sleep(2 * (attempt + 1))
-    if "errors" in payload:
-        sys.exit("GraphQL error: " + json.dumps(payload["errors"]))
-    return payload["data"]
+            continue
+        if "errors" in payload:
+            return failed("GraphQL error: " + json.dumps(payload["errors"]))
+        return payload["data"]
 
 
 # ----------------------------------------------------------------- probes
@@ -152,15 +158,14 @@ def graphql(query, variables, attempts=3):
 def probe(url, attempts=2):
     """Return (ok, status, latency_ms). Never raises; a dead service is data.
 
-    Retries once: the card stands for six hours, which is far too long to show a
+    Retries once: the card can stand for six hours, which is far too long to show a
     live site as down because one TCP connect happened to lose a race.
     """
     status = None
     for attempt in range(attempts):
         started = time.time()
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": "profile-card"})
-            with urllib.request.urlopen(req, timeout=10, context=ssl.create_default_context()) as resp:
+            with _request(url, {"User-Agent": "profile-card"}, timeout=10) as resp:
                 status = resp.status
                 resp.read(1)
         except urllib.error.HTTPError as exc:
@@ -171,19 +176,8 @@ def probe(url, attempts=2):
                 time.sleep(2)
             continue
         latency = int((time.time() - started) * 1000)
-        if 200 <= status < 400:
-            return True, status, latency
-        return False, status, latency
+        return 200 <= status < 400, status, latency
     return False, status, None
-
-
-def days_since(iso_date):
-    """Whole days since an ISO date, or None if it is missing or still ahead."""
-    if not iso_date:
-        return None
-    start = datetime.strptime(iso_date, "%Y-%m-%d").replace(tzinfo=timezone.utc)
-    days = (datetime.now(timezone.utc) - start).days
-    return days if days >= 0 else None
 
 
 # ----------------------------------------------------------------- github
@@ -215,6 +209,49 @@ query($login: String!, $after: String) {
 }
 """
 
+PROFILE_QUERY = """
+query($login: String!) {
+  repository(owner: $login, name: $login) {
+    defaultBranchRef {
+      target {
+        ... on Commit {
+          history(first: 100) { nodes { committedDate author { user { login } } } }
+        }
+      }
+    }
+  }
+}
+"""
+
+
+def profile_repo_push(login):
+    """Newest commit in the profile repo that `login` wrote themselves, or None.
+
+    The profile repo's own pushedAt is useless as a signal: this workflow commits
+    the rendered SVGs back into it on every run, so the timestamp reports the cron
+    schedule rather than any work -- it read ~5h ago forever, matching the previous
+    bot commit to the second. Skipping the repo outright was the first fix and
+    traded one wrong answer for another: it hid real commits here, including every
+    change to this file. Filtering the bot out by author keeps them visible.
+
+    Its own request, and a non-fatal one, because this is the only part of the card
+    that is an enrichment rather than a fact: if the field ever changes shape,
+    "Last push" loses one repo's worth of reach instead of the cron failing and
+    every row on the card going stale.
+
+    Only the most recent commits are searched. If the user's last commit here is
+    older than those, some other repo is newer anyway and this could never win.
+    """
+    data = graphql(PROFILE_QUERY, {"login": login}, required=False)
+    ref = ((data or {}).get("repository") or {}).get("defaultBranchRef") or {}
+    history = (ref.get("target") or {}).get("history") or {}
+    for node in history.get("nodes") or []:
+        author = (node.get("author") or {}).get("user") or {}
+        if (author.get("login") or "").lower() == login.lower():
+            return node["committedDate"]
+    return None
+
+
 def github_stats(login, exclude=()):
     """Everything the panel needs, from one paged query.
 
@@ -227,6 +264,10 @@ def github_stats(login, exclude=()):
     agree with what a visitor sees on the profile, and an excluded repo is still
     listed there and can still be starred. Filtering them as well is what made
     the card report 6 public against a profile showing 7.
+
+    "Last push" is the newest pushedAt across every repo but the profile repo,
+    plus the newest commit in that one the user wrote themselves -- see
+    profile_repo_push for why it cannot speak for itself.
     """
     after, pushed = None, None
     stars, languages = 0, {}
@@ -243,11 +284,8 @@ def github_stats(login, exclude=()):
             else:
                 public += 1
             stars += node["stargazerCount"]
-            # The profile repo is skipped here and only here. This workflow pushes
-            # the rendered SVGs back into it every run, which bumps its own
-            # pushedAt, so counting it makes "Last push" a readout of the cron
-            # schedule rather than of any work: it reported ~5h ago forever,
-            # matching the previous bot commit to the second.
+            # The profile repo's pushedAt is ignored here and only here; its real
+            # commits come back through profile_repo_push below.
             if node["name"].lower() != login.lower():
                 if node["pushedAt"] and (pushed is None or node["pushedAt"] > pushed):
                     pushed = node["pushedAt"]
@@ -260,6 +298,10 @@ def github_stats(login, exclude=()):
         if not block["pageInfo"]["hasNextPage"]:
             break
         after = block["pageInfo"]["endCursor"]
+
+    authored = profile_repo_push(login)
+    if authored and (pushed is None or authored > pushed):
+        pushed = authored
 
     contrib = user["contributionsCollection"]
     return {
@@ -302,31 +344,39 @@ def language_shares(languages, count=LANG_COUNT):
     return [(name, "%d%%" % pct, pct / 100.0, color) for name, pct, color in out]
 
 
+# ----------------------------------------------------------------- time
+
+MINUTE, HOUR, DAY, WEEK, YEAR = 60, 3600, 86400, 86400 * 7, 86400 * 365
+
 # (limit, unit, suffix): the tier applies while the elapsed time is under `limit`,
 # and is then reported in multiples of `unit`. Years are handled past the last tier.
 TIME_TIERS = (
-    (3600, 60, "m"),
-    (86400, 3600, "h"),
-    (86400 * 7, 86400, "d"),
-    (86400 * 365, 86400 * 7, "w"),
+    (HOUR, MINUTE, "m"),
+    (DAY, HOUR, "h"),
+    (WEEK, DAY, "d"),
+    (YEAR, WEEK, "w"),
 )
 
 
+def days_since(iso_date):
+    """Whole days since an ISO date, or None if it is missing or still ahead."""
+    if not iso_date:
+        return None
+    start = datetime.strptime(iso_date, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+    days = (datetime.now(timezone.utc) - start).days
+    return days if days >= 0 else None
+
+
 def relative_time(iso_stamp, now=None):
-    """"4h ago" / "3d ago", aimed at the middle of the window it gets read in.
+    """"4h ago" / "3d ago" from an ISO-8601 UTC stamp, or None if it cannot be read.
 
-    The string is frozen into the SVG when the cron runs, but nobody reads it then:
-    it is read at some unknown point over the following REFRESH seconds, by which
-    time the real gap has grown. Rendering the gap as measured therefore runs late
-    by 0..REFRESH, always in the same direction. Adding half a refresh period aims
-    the value at the middle of that window, so the error is centred on zero and
-    bounded by REFRESH/2 either way instead of stacking up on one side.
+    Rounds rather than floors below a year: `//` reports 5h59m as "5h ago", a full
+    hour of lag always in the same direction. Years floor instead, matching
+    account_age -- rounding there would read 1y7m as "2y", and half a year of
+    overstatement is not a rounding artifact, it is a wrong claim.
 
-    Rounding rather than flooring removes the other one-sided lag: `//` reported
-    5h59m as "5h ago", costing up to another full hour in the same direction.
-
-    The tradeoff is that a push made just before a render reads ~REFRESH/2 old
-    immediately after that render. That is the cost of being unbiased on average.
+    A stamp in the future is clock skew between GitHub and the runner rather than
+    a prediction, so anything under a minute either way reads "just now".
     """
     if not iso_stamp:
         return None
@@ -335,8 +385,8 @@ def relative_time(iso_stamp, now=None):
     except ValueError:
         # Drop the row rather than fail the build over a stamp format change.
         return None
-    seconds = ((now or datetime.now(timezone.utc)) - when).total_seconds() + REFRESH / 2
-    if seconds < 0:
+    seconds = ((now or datetime.now(timezone.utc)) - when).total_seconds()
+    if seconds < MINUTE:
         return "just now"
     for limit, unit, suffix in TIME_TIERS:
         if seconds < limit:
@@ -345,7 +395,7 @@ def relative_time(iso_stamp, now=None):
                 return "%d%s ago" % (value, suffix)
             # Rounding pushed it over its own tier (59m40s -> "60m"). Fall through
             # and let the next tier say "1h" instead.
-    return "%dy ago" % max(int(round(seconds / (86400 * 365))), 1)
+    return "%dy ago" % max(int(seconds // YEAR), 1)
 
 
 def account_age(created_at):
@@ -580,7 +630,7 @@ def read_art():
     try:
         with open(os.path.join(HERE, "ascii.cov"), encoding="utf-8") as fh:
             covers = [line.rstrip("\n") for line in fh]
-    except IOError:
+    except FileNotFoundError:
         return glyphs, None
     if len(covers) != len(glyphs) or any(len(c) != len(g) for c, g in zip(covers, glyphs)):
         sys.stderr.write("ascii.cov does not match ascii.txt, rendering art flat\n")
@@ -604,8 +654,6 @@ def art_rects(glyphs, covers):
     exist, and OVERLAP closes the ones that remain.
     """
     half_w, half_h = CHAR_W / 2, LINE_H / 2
-    # Not `span`: that is the tspan helper, and shadowing it here would turn any
-    # future span() call in this function into "int is not callable".
     cols = max((len(line) for line in glyphs), default=0) * 2
 
     grid = []
@@ -714,7 +762,7 @@ def render(theme_name, palette, art, art_rows, blocks, rows, outdir):
         "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 %d %d' "
         "font-family='ConsolasFallback,Consolas,Menlo,monospace' "
         "width='%dpx' height='%dpx' font-size='%dpx'>" % (width, height, width, height, FONT_SIZE),
-        "<title>Aiden Kopec: live profile card, generated every six hours</title>",
+        "<title>Aiden Kopec: live profile card, regenerated at least every six hours</title>",
         "<defs>",
         # userSpaceOnUse, not objectBoundingBox: the mark is hundreds of separate
         # rects, and each would otherwise get its own copy of the whole ramp.
@@ -780,7 +828,8 @@ def offline_fixtures(cfg):
         "stars": 6, "starred": 51, "followers": 6,
         "commits": 748,
         "created_at": "2022-01-10T21:38:11Z",
-        "pushed_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "pushed_at": (datetime.now(timezone.utc) - timedelta(hours=2)).strftime(
+            "%Y-%m-%dT%H:%M:%SZ"),
         # Proportions mirror the real account after exclude_repos, so a preview is
         # never a flattering lie. Update these if the real distribution moves.
         "languages": {
@@ -816,8 +865,8 @@ def main():
     rows = build_rows(cfg, stats, services)
 
     outdir = PREVIEW if offline else HERE
+    blocks = [("Languages by bytes", language_shares(stats["languages"]))]
     for name, palette in THEMES.items():
-        blocks = [("Languages by bytes", language_shares(stats["languages"]))]
         print("wrote", render(name, palette, art, len(glyphs), blocks, rows, outdir))
 
 

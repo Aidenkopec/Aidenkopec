@@ -33,19 +33,16 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, ROOT)
 
-from today import ASCII_COLS, CHAR_W, LINE_H  # noqa: E402  (grid constants, single source)
+from today import ASCII_COLS, CHAR_W, GLYPH_BITS, LINE_H  # noqa: E402  (single source)
 
 INK = 0.5        # a quadrant is ink when this much of it is covered
 MARGIN = 1       # columns of gutter kept on the left
 COLS = 40        # ASCII_COLS is the hard ceiling; 40 leaves a little air
 
-# (top-left, top-right, bottom-left, bottom-right) -> glyph
-QUADRANTS = {
-    (0, 0, 0, 0): " ", (1, 0, 0, 0): "▘", (0, 1, 0, 0): "▝", (1, 1, 0, 0): "▀",
-    (0, 0, 1, 0): "▖", (1, 0, 1, 0): "▌", (0, 1, 1, 0): "▞", (1, 1, 1, 0): "▛",
-    (0, 0, 0, 1): "▗", (1, 0, 0, 1): "▚", (0, 1, 0, 1): "▐", (1, 1, 0, 1): "▜",
-    (0, 0, 1, 1): "▄", (1, 0, 1, 1): "▙", (0, 1, 1, 1): "▟", (1, 1, 1, 1): "█",
-}
+# (top-left, top-right, bottom-left, bottom-right) -> glyph. Inverted from the
+# decoder rather than written out again: the two tables have to agree exactly, and
+# the only way to guarantee that is for there to be one of them.
+QUADRANTS = {bits: glyph for glyph, bits in GLYPH_BITS.items()}
 
 
 def asciify(path, cols):
