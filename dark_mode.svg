@@ -135,7 +135,7 @@ text, tspan {white-space: pre;}
 <rect x='390.57' y='305.0' width='10.13' height='10.5' class="aa2"/>
 </g>
 <rect x='140.19' y='501' width='154.08' height='8' rx='4' fill='#E6F0FA' fill-opacity='0.18'/>
-<rect x='140.19' y='501' width='110.94' height='8' rx='4' fill='#3178c6'/>
+<rect x='140.19' y='501' width='109.40' height='8' rx='4' fill='#3178c6'/>
 <rect x='140.19' y='521' width='154.08' height='8' rx='4' fill='#E6F0FA' fill-opacity='0.18'/>
 <rect x='140.19' y='521' width='21.57' height='8' rx='4' fill='#e34c26'/>
 <rect x='140.19' y='541' width='154.08' height='8' rx='4' fill='#E6F0FA' fill-opacity='0.18'/>
@@ -145,17 +145,17 @@ text, tspan {white-space: pre;}
 <rect x='140.19' y='581' width='154.08' height='8' rx='4' fill='#E6F0FA' fill-opacity='0.18'/>
 <rect x='140.19' y='581' width='4.62' height='8' rx='4' fill='#663399'/>
 <rect x='140.19' y='601' width='154.08' height='8' rx='4' fill='#E6F0FA' fill-opacity='0.18'/>
-<rect x='140.19' y='601' width='2.00' height='8' rx='4' fill='#3572A5'/>
+<rect x='140.19' y='601' width='3.08' height='8' rx='4' fill='#3572A5'/>
 <rect x='140.19' y='621' width='154.08' height='8' rx='4' fill='#E6F0FA' fill-opacity='0.18'/>
 <rect x='140.19' y='621' width='3.08' height='8' rx='4' fill='#37607C'/>
 <text x='15' y='491' fill='#E6F0FA'>
 <tspan x='15' y='491'><tspan class="dim">─ </tspan><tspan class="key">Languages by bytes</tspan><tspan class="dim"> ─────────────────────</tspan></tspan>
-<tspan x='15' y='511'><tspan class="value"> TypeScript  </tspan><tspan class="dim">                 </tspan><tspan class="key">  72%</tspan></tspan>
+<tspan x='15' y='511'><tspan class="value"> TypeScript  </tspan><tspan class="dim">                 </tspan><tspan class="key">  71%</tspan></tspan>
 <tspan x='15' y='531'><tspan class="value"> HTML        </tspan><tspan class="dim">                 </tspan><tspan class="key">  14%</tspan></tspan>
 <tspan x='15' y='551'><tspan class="value"> JavaScript  </tspan><tspan class="dim">                 </tspan><tspan class="key">   5%</tspan></tspan>
 <tspan x='15' y='571'><tspan class="value"> Java        </tspan><tspan class="dim">                 </tspan><tspan class="key">   3%</tspan></tspan>
 <tspan x='15' y='591'><tspan class="value"> CSS         </tspan><tspan class="dim">                 </tspan><tspan class="key">   3%</tspan></tspan>
-<tspan x='15' y='611'><tspan class="value"> Python      </tspan><tspan class="dim">                 </tspan><tspan class="key">   1%</tspan></tspan>
+<tspan x='15' y='611'><tspan class="value"> Python      </tspan><tspan class="dim">                 </tspan><tspan class="key">   2%</tspan></tspan>
 <tspan x='15' y='631'><tspan class="value"> other       </tspan><tspan class="dim">                 </tspan><tspan class="key">   2%</tspan></tspan>
 </text>
 <text x='438.7' y='31' fill='#E6F0FA'>
@@ -168,8 +168,8 @@ text, tspan {white-space: pre;}
 <tspan x='438.7' y='151'><tspan class="dim">· </tspan><tspan class="key">Editor:</tspan><tspan class="dim"> .......................................... </tspan><tspan class="value">VS Code</tspan></tspan>
 <tspan x='438.7' y='171'></tspan>
 <tspan x='438.7' y='191'><tspan class="dim">─ </tspan><tspan class="key">Services</tspan><tspan class="dim"> ─────────────────────────────────────────────────</tspan></tspan>
-<tspan x='438.7' y='211'><tspan class="dim">· </tspan><tspan class="value">idotogether.com</tspan><tspan class="dim"> ..................... </tspan><tspan class="add">● </tspan><tspan class="fg">111d   200 · 265ms</tspan></tspan>
-<tspan x='438.7' y='231'><tspan class="dim">· </tspan><tspan class="value">aidenkopec.com</tspan><tspan class="dim"> ..................... </tspan><tspan class="add">● </tspan><tspan class="fg">1292d   200 · 299ms</tspan></tspan>
+<tspan x='438.7' y='211'><tspan class="dim">· </tspan><tspan class="value">idotogether.com</tspan><tspan class="dim"> ..................... </tspan><tspan class="add">● </tspan><tspan class="fg">111d   200 · 283ms</tspan></tspan>
+<tspan x='438.7' y='231'><tspan class="dim">· </tspan><tspan class="value">aidenkopec.com</tspan><tspan class="dim"> ..................... </tspan><tspan class="add">● </tspan><tspan class="fg">1292d   200 · 379ms</tspan></tspan>
 <tspan x='438.7' y='251'></tspan>
 <tspan x='438.7' y='271'><tspan class="dim">─ </tspan><tspan class="key">In Production</tspan><tspan class="dim"> ────────────────────────────────────────────</tspan></tspan>
 <tspan x='438.7' y='291'><tspan class="dim">· </tspan><tspan class="key">Core:</tspan><tspan class="dim"> ................ </tspan><tspan class="value">TypeScript, JavaScript, Python, SQL</tspan></tspan>
@@ -180,15 +180,15 @@ text, tspan {white-space: pre;}
 <tspan x='438.7' y='391'><tspan class="dim">─ </tspan><tspan class="key">GitHub</tspan><tspan class="dim"> ───────────────────────────────────────────────────</tspan></tspan>
 <tspan x='438.7' y='411'><tspan class="dim">· </tspan><tspan class="key">Repos:</tspan><tspan class="dim"> ............................. </tspan><tspan class="value">7 public</tspan><tspan class="dim"> · </tspan><tspan class="value">60 private</tspan></tspan>
 <tspan x='438.7' y='431'><tspan class="dim">· </tspan><tspan class="key">Stars:</tspan><tspan class="dim"> ............................. </tspan><tspan class="value">6 received</tspan><tspan class="dim"> · </tspan><tspan class="value">51 given</tspan></tspan>
-<tspan x='438.7' y='451'><tspan class="dim">· </tspan><tspan class="key">Commits (1y):</tspan><tspan class="dim"> ........................................ </tspan><tspan class="value">751</tspan></tspan>
+<tspan x='438.7' y='451'><tspan class="dim">· </tspan><tspan class="key">Commits (1y):</tspan><tspan class="dim"> ........................................ </tspan><tspan class="value">754</tspan></tspan>
 <tspan x='438.7' y='471'><tspan class="dim">· </tspan><tspan class="key">Followers:</tspan><tspan class="dim"> ............................................. </tspan><tspan class="value">6</tspan></tspan>
 <tspan x='438.7' y='491'><tspan class="dim">· </tspan><tspan class="key">Last push:</tspan><tspan class="dim"> ...................................... </tspan><tspan class="value">just now</tspan></tspan>
 <tspan x='438.7' y='511'></tspan>
 <tspan x='438.7' y='531'><tspan class="dim">─ </tspan><tspan class="key">Contact</tspan><tspan class="dim"> ──────────────────────────────────────────────────</tspan></tspan>
-<tspan x='438.7' y='551'><tspan class="dim">· </tspan><tspan class="key">Email:</tspan><tspan class="dim"> ............................. </tspan><tspan class="value">Aidenkopec@icloud.com</tspan></tspan>
+<tspan x='438.7' y='551'><tspan class="dim">· </tspan><tspan class="key">Email:</tspan><tspan class="dim"> .............................. </tspan><tspan class="value">aiden@aidenkopec.com</tspan></tspan>
 <tspan x='438.7' y='571'><tspan class="dim">· </tspan><tspan class="key">LinkedIn:</tspan><tspan class="dim"> .................................... </tspan><tspan class="value">aiden-kopec</tspan></tspan>
 <tspan x='438.7' y='591'><tspan class="dim">· </tspan><tspan class="key">Portfolio:</tspan><tspan class="dim"> ................................ </tspan><tspan class="value">aidenkopec.com</tspan></tspan>
 <tspan x='438.7' y='611'></tspan>
-<tspan x='438.7' y='631'><tspan class="dim">Last checked: 2026-08-20 17:27 UTC</tspan></tspan>
+<tspan x='438.7' y='631'><tspan class="dim">Last checked: 2026-08-20 17:45 UTC</tspan></tspan>
 </text>
 </svg>
