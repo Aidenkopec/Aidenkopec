@@ -5,7 +5,7 @@
   "timezone": { "zone": "America/Edmonton", "note": "async-friendly" },
 
   "//exclude_repos": "Repos you own but did not author -- vendored, cloned or scaffolded. Language bytes only: an excluded repo is still counted and still contributes its stars, so the card keeps agreeing with the public profile. See github_stats() in today.py.",
-  "exclude_repos": ["freqtrade"],
+  "exclude_repos": [],
 
   "identity": [
     ["Timezone",   "@timezone"],
